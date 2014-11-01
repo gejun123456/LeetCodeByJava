@@ -28,7 +28,8 @@ public class WordLadderII {
             if (judge == 0) {
                 return result;
             } else {
-                Integer min = new Integer(10000);
+                List<Integer> min = new ArrayList<Integer>();
+                min.add(10000);
                 solution.add(start);
                 check(start, end, dict, solution, result, min);
                 return result;
@@ -36,36 +37,37 @@ public class WordLadderII {
         }
     }
 
-    private void check(String start, String end, Set<String> dict, List<String> solution, List<List<String>> result, Integer min) {
+    private void check(String start, String end, Set<String> dict, List<String> solution, List<List<String>> result, List<Integer> min) {
 
-        Iterator it = dict.iterator();
-        while(it.hasNext()) {
+        for(Iterator it = dict.iterator();it.hasNext();) {
             String word = it.next().toString();
-            if (solution.size() < min - 1) {
+            if (solution.size() < min.get(0) - 1 && compare(word,end)<=(min.get(0) - solution.size()) ) {
                 if (compare(start, word) == 1 && compare(word, end) == 1) {
                     solution.add(word);
                     solution.add(end);
-                    List<String> convert = new ArrayList<String>();
-                    for (String s : solution) {
-                        convert.add(s);
-                    }
-                    if (result.size() == 0 || solution.size() == min) {
-                        result.add(convert);
-                    } else if (solution.size() < min) {
+                    if (result.size() == 0 || solution.size() == min.get(0)) {
+                        result.add(solution);
+                    } else if (solution.size() < min.get(0)) {
                         result.clear();
-                        result.add(convert);
+                        result.add(solution);
                     }
-                    min = solution.size();
-                    solution.remove(word);
-                    solution.remove(end);
+                    min.add(0,solution.size());
                 } else if (compare(start, word) == 1) {
-                    dict.remove(word);
-                    solution.add(word);
-                    if (dict.size() != 0) {
-                        check(word, end, dict, solution, result, min);
+                    Set<String> newDict = new HashSet<String>();
+                    for(Iterator o = dict.iterator();o.hasNext();) {
+                        String dic = o.next().toString();
+                        if(dic != word) {
+                            newDict.add(dic);
+                        }
                     }
-                    solution.remove(word);
-                    dict.add(word);
+                    List<String> nextSolution = new ArrayList<String>();
+                    for(String s : solution) {
+                        nextSolution.add(s);
+                    }
+                    nextSolution.add(word);
+                    if (newDict.size() != 0) {
+                        check(word, end, newDict, nextSolution, result, min);
+                    }
                 }
             }
         }
@@ -91,6 +93,7 @@ public class WordLadderII {
         dict.add("lot");
         dict.add("log");
         result = wordLadderII.findLadders("hit", "cog", dict);
+        System.out.println(result.size());
         for (List<String> solution : result) {
             for (String s : solution) {
                 System.out.print(s + " ");
