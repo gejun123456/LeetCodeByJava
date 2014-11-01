@@ -41,17 +41,21 @@ public class WordLadderII {
 
         for(Iterator it = dict.iterator();it.hasNext();) {
             String word = it.next().toString();
-            if (solution.size() < min.get(0) - 1 && compare(word,end)<=(min.get(0) - solution.size()) ) {
-                if (compare(start, word) == 1 && compare(word, end) == 1) {
-                    solution.add(word);
-                    solution.add(end);
-                    if (result.size() == 0 || solution.size() == min.get(0)) {
-                        result.add(solution);
-                    } else if (solution.size() < min.get(0)) {
-                        result.clear();
-                        result.add(solution);
+            if (solution.size() <= min.get(0) - 1 && compare(word,end)<=(min.get(0) - solution.size()) ) {
+                if (compare(start, end)==1) {
+                    List<String> convert = new ArrayList<String>();
+                    for(String s : solution) {
+                        convert.add(s);
                     }
-                    min.add(0,solution.size());
+                    convert.add(end);
+                    if (result.size() == 0 || convert.size() == min.get(0)) {
+                        result.add(convert);
+                    } else if (convert.size() < min.get(0)) {
+                        result.clear();
+                        result.add(convert);
+                    }
+                    min.add(0,convert.size());
+                    break;
                 } else if (compare(start, word) == 1) {
                     Set<String> newDict = new HashSet<String>();
                     for(Iterator o = dict.iterator();o.hasNext();) {
@@ -60,14 +64,11 @@ public class WordLadderII {
                             newDict.add(dic);
                         }
                     }
-                    List<String> nextSolution = new ArrayList<String>();
-                    for(String s : solution) {
-                        nextSolution.add(s);
-                    }
-                    nextSolution.add(word);
+                    solution.add(word);
                     if (newDict.size() != 0) {
-                        check(word, end, newDict, nextSolution, result, min);
+                        check(word, end, newDict, solution, result, min);
                     }
+                    solution.remove(word);
                 }
             }
         }
