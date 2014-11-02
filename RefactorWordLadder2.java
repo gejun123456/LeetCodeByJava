@@ -1,3 +1,5 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.util.*;
 
 /**
@@ -7,17 +9,19 @@ public class RefactorWordLadder2 {
     public class node {
         String value;
         node next;
+        Set<Integer> used = new HashSet<Integer>();
     }
 
     public List<List<String>> findLadders(String start, String end, Set<String> dict) {
         List<List<String>> result = new ArrayList<List<String>>();
         List<node> solution = new ArrayList<node>();
         node first = new node();
-        first.value = start;
+        first.value = end;
+        first.used =new HashSet<Integer>();
         solution.add(first);
         dict.remove(start);
         dict.remove(end);
-        result = search(solution, end, dict);
+        result = search(solution, start, dict);
         return result;
     }
 
@@ -25,68 +29,66 @@ public class RefactorWordLadder2 {
         List<List<String>> result = new ArrayList<List<String>>();
         List<node> realResult = new ArrayList<node>();
         List<node> currentResult = new ArrayList<node>();
+        List<String> endResult = compute(end);
         List<String> deleted = new ArrayList<String>();
         int k = 0;
         for (node so : nodeList) {
-            if (compare(so.value, end)) {
+            if (endResult.contains(so.value)) {
                 node ss = new node();
                 ss.value = end;
                 ss.next = so;
                 realResult.add(ss);
                 k = 1;
-            } else if (k != 1) {
-                for (String s : compute(so.value)) {
-                    if (dict.contains(s)) {
-                        node ss = new node();
-                        ss.value = s;
-                        ss.next = so;
-                        currentResult.add(ss);
-                    }
-                }
             }
         }
         if (k == 1) {
             for (node so : realResult) {
                 List<String> sol = new ArrayList<String>();
-                String[] arr = new String[1000];
-                int i = 0;
-                while (so.next != null) {
-                    arr[i] = so.value;
+                while (so != null) {
+                   sol.add(so.value);
                     so = so.next;
-                    i++;
-                }
-                for (int u = i - 1; u >= 0; u--) {
-                    sol.add(arr[u]);
                 }
                 result.add(sol);
             }
             return result;
         } else {
+            for (node so : nodeList) {
+                String p = so.value;
+                for(int i = 0 ;i<p.length();i++) {
+                    if(so.used.contains(i)) {
+                        continue;
+                    }
+                    for(char c = 'a';c<='z';c++ ){
+                        String str = p.substring(0, i) + c + p.substring(i + 1, p.length());
+                        if(dict.contains(str)) {
+                            deleted.add(str);
+                            node ss = new node();
+                        ss.value = str;
+                        ss.next = so;
+                        Set<Integer> uu = new HashSet<Integer>();
+                            for(Iterator it = so.used.iterator();it.hasNext();) {
+                                uu.add((Integer)it.next());
+                            }
+                        uu.add(i);
+                        currentResult.add(ss);
+                        deleted.add(str);
+                        }
+                    }
+                }
+//                for (String s : computeNode(so)) {
+//                    if (dict.contains(s)) {
+//
+//                    }
+//                }
+            }
             if (currentResult.size() == 0) {
                 return result;
             }
-            for (String s : deleted) {
+            for(String s : deleted) {
                 dict.remove(s);
             }
             return search(currentResult, end, dict);
         }
-    }
-
-    private boolean compare(String p, String q) {
-        int l = p.length();
-        int difference = 0;
-        for (int i = 0; i < l; i++) {
-            if (p.charAt(i) != q.charAt(i)) {
-                difference++;
-                if (difference > 1) {
-                    return false;
-                }
-            }
-        }
-        if (difference != 1) {
-            return false;
-        }
-        return true;
     }
 
     private List<String> compute(String p) {
@@ -104,7 +106,7 @@ public class RefactorWordLadder2 {
     }
 
     public static void main(String[] args) {
-        WordLadderII wordLadderII = new WordLadderII();
+        RefactorWordLadder2 wordLadder = new RefactorWordLadder2();
         List<List<String>> result = new ArrayList<List<String>>();
         Set<String> dict = new HashSet<String>();
         dict.add("hot");
@@ -112,7 +114,7 @@ public class RefactorWordLadder2 {
         dict.add("dog");
         dict.add("lot");
         dict.add("log");
-        result = wordLadderII.findLadders("hit", "cog", dict);
+        result = wordLadder.findLadders("hit", "cog", dict);
         System.out.println(result.size());
         for (List<String> solution : result) {
             for (String s : solution) {
@@ -120,5 +122,6 @@ public class RefactorWordLadder2 {
             }
             System.out.println();
         }
+        System.out.println("nimaya");
     }
 }

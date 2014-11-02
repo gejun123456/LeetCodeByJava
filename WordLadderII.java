@@ -84,6 +84,7 @@ public class WordLadderII {
         return difference;
     }
 
+
     public static void main(String[] args) {
         WordLadderII wordLadderII = new WordLadderII();
         List<List<String>> result = new ArrayList<List<String>>();
