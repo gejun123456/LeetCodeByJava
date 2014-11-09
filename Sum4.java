@@ -27,47 +27,44 @@ public class Sum4 {
         min[4] = 0;
         int last = -1;
         int current = 0;
-        List<Integer> solution = new ArrayList<Integer>();
-        generate(result, solution, last, current, num, target, max,min);
+        int[] solution = new int[4];
+        double sum = 0;
+        int count = 0;
+        generate(result, solution,sum, last, current, num, target, max,min,count);
         return result;
     }
 
-    private void generate(List<List<Integer>> result, List<Integer> solution, int last, int current, int[] num, int target, double[] max,double[] min) {
-        if (solution.size() > 4) {
+    private void generate(List<List<Integer>> result, int[] solution,double sum, int last, int current, int[] num, int target, double[] max,double[] min,int count) {
+        if(count>4){
             return;
         }
-        if (current == num.length && solution.size() < 4) {
+        if (current == num.length && count < 4) {
             return;
         }
-        double sumK = 0;
-        for (Integer s : solution) {
-            sumK += s;
-        }
-        if (sumK + max[solution.size()] < target) {
+        if (sum + max[count] < target) {
             return;
         }
-        if(sumK + min[solution.size()] > target) {
+        if(sum + min[count] > target) {
             return;
         }
-        if (solution.size() == 4) {
+        if (count == 4) {
             List<Integer> newSolution = new ArrayList<Integer>();
-            if (sumK == target) {
-                for (Integer i : solution) {
-                    newSolution.add(i);
+            if (sum == target) {
+                for (int i = 0; i < 4; i++) {
+                    newSolution.add(solution[i]);
                 }
                 result.add(newSolution);
             }
         } else {
             if (last != -1 && num[current] == num[current - 1] && (current - last) != 1) {
-                generate(result, solution, last, current + 1, num, target, max,min);
+                generate(result, solution,sum, last, current + 1, num, target, max,min,count);
             } else {
                 for (int i = 0; i < 2; i++) {
                     if (i == 0) {
-                        solution.add(num[current]);
-                        generate(result, solution, current, current + 1, num, target, max,min);
-                        solution.remove(solution.size() - 1);
+                        solution[count] = num[current];
+                        generate(result, solution,sum+num[current], current, current + 1, num, target, max,min,count+1);
                     } else {
-                        generate(result, solution, last, current + 1, num, target, max,min);
+                        generate(result, solution,sum, last, current + 1, num, target, max,min,count);
                     }
                 }
             }
