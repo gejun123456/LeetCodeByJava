@@ -11,7 +11,7 @@ public class FullPermutation {
     public List<List<Integer>> fourSum(int[] num, int target) {
         List<List<Integer>> result = new ArrayList<List<Integer>>();
         Arrays.sort(num);
-        int last = -1;
+        int last = -2;
         int current = 0;
         List<Integer> solution = new ArrayList<Integer>();
         generate(result,solution,last,current,num);
@@ -27,7 +27,7 @@ public class FullPermutation {
             result.add(newSolution);
         }
         else {
-            if(last!=-1&&num[current]==num[current-1]&&(current-last)!=1) {
+            if(current!=0&&num[current]==num[current-1]&&(current-last)!=1) {
                 generate(result, solution, last, current+1, num);
             } else {
                 for(int i = 0 ;i<2;i++) {
