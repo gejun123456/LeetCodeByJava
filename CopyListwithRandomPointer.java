@@ -33,12 +33,22 @@ public class CopyListwithRandomPointer {
                 r.random = null;
             } else {
                 RandomListNode ran = p.random;
-                
+                int k = 0;
+                while(ran!=null) {
+                    k++;
+                    ran = ran.next;
+                }
+                RandomListNode q = res;
+                int index = 0;
+                while(index!=length-k) {
+                    q=q.next;
+                    index++;
+                }
+                r.random = q;
             }
             p = p.next;
             r = r.next;
         }
-
         return res;
     }
 
@@ -77,5 +87,6 @@ public class CopyListwithRandomPointer {
             }
             p = p.next;
         }
+        System.out.println();
     }
 }
