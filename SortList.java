@@ -5,17 +5,18 @@ import java.util.List;
 /**
  * Created by Administrator on 14-11-3.
  */
-class ListNode {
-    int val;
-    ListNode next;
-
-    ListNode(int x) {
-        val = x;
-        next = null;
-    }
-}
 
 public class SortList {
+
+    class ListNode {
+        int val;
+        ListNode next;
+
+        ListNode(int x) {
+            val = x;
+            next = null;
+        }
+    }
 
     public ListNode sortList(ListNode head) {
         ListNode p = head;
