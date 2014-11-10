@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by bruce on 14-11-9.
  */
@@ -16,12 +19,15 @@ public class CopyListwithRandomPointer {
             return null;
         }
         RandomListNode res = new RandomListNode(head.label);
+        Map<RandomListNode,RandomListNode> random = new HashMap<RandomListNode,RandomListNode>();
+        random.put(head,res);
         RandomListNode p = head.next;
         RandomListNode r = res;
         int length = 1;
         while(p!=null) {
             length++;
             RandomListNode n = new RandomListNode(p.label);
+            random.put(p,n);
             r.next = n;
             r = n;
             p = p.next;
@@ -32,19 +38,7 @@ public class CopyListwithRandomPointer {
             if(p.random==null) {
                 r.random = null;
             } else {
-                RandomListNode ran = p.random;
-                int k = 0;
-                while(ran!=null) {
-                    k++;
-                    ran = ran.next;
-                }
-                RandomListNode q = res;
-                int index = 0;
-                while(index!=length-k) {
-                    q=q.next;
-                    index++;
-                }
-                r.random = q;
+                r.random = random.get(p.random);
             }
             p = p.next;
             r = r.next;
