@@ -3,7 +3,7 @@
  */
 public class ReverseLinkedListII {
     public ListNode reverseBetween(ListNode head, int m, int n) {
-        if(head == null) {
+        if (head == null) {
             return head;
         }
         ListNode h = new ListNode(0);
@@ -11,26 +11,27 @@ public class ReverseLinkedListII {
         int count = 0;
         ListNode r = h;
         ListNode u = h;
-        while(p!=null) {
+        while (p != null) {
             count++;
             ListNode q = p.next;
-            if(count<m) {
+            if (count < m) {
                 p.next = null;
                 r.next = p;
                 r = p;
-            } else if(count>=m&&count<=n) {
-                if(count==m) {
+            } else if (count >= m && count <= n) {
+                if (count == m) {
                     u = p;
                 }
                 p.next = r.next;
                 r.next = p;
-            } else if(count>n) {
+            } else if (count > n) {
                 p.next = null;
                 u.next = p;
                 u = p;
             }
             p = q;
         }
+
         return h.next;
     }
 
