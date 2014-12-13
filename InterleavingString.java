@@ -85,7 +85,9 @@ public class InterleavingString {
                     if (find(s1, s2, s3) == true) {
                         return true;
                     } else {
-                        return false;
+                        reset();
+                        endA = endA +1;
+                        startB =startB-1;
                     }
                 }
                 return false;
@@ -101,7 +103,7 @@ public class InterleavingString {
                         startA = startA - 1;
                         endA = endA + 1;
                     }
-                } else if (startB<=endB&&s1.charAt(startA) == s3.charAt(start) && s2.charAt(endB) == s3.charAt(end)) {
+                } if (startB<=endB&&s1.charAt(startA) == s3.charAt(start) && s2.charAt(endB) == s3.charAt(end)) {
                     limit();
                     startA = startA + 1;
                     endB = endB - 1;
@@ -112,20 +114,21 @@ public class InterleavingString {
                         startA = startA - 1;
                         endB = endB + 1;
                     }
-                } else if (startB<endB&&s2.charAt(startB) == s3.charAt(start) && s2.charAt(endB) == s3.charAt(end)) {
+                }  if (startB<endB&&s2.charAt(startB) == s3.charAt(start) && s2.charAt(endB) == s3.charAt(end)) {
                     setRegular();
                     if (find(s1, s2, s3) == true) {
                         return true;
                     } else {
                         removeRegular();
                     }
-                } else if (startB <= endB&&s2.charAt(startB) == s3.charAt(start) && s1.charAt(endA) == s3.charAt(end)) {
+                } if (startB <= endB&&s2.charAt(startB) == s3.charAt(start) && s1.charAt(endA) == s3.charAt(end)) {
                     limit();
                     startB = startB + 1;
                     endA = endA - 1;
                     if (find(s1, s2, s3) == true) {
                         return true;
                     } else {
+                       reset();
                        startB = startB-1;
                        endA = endA+1;
                     }
@@ -174,7 +177,7 @@ public class InterleavingString {
         endB = endB - 1;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) {        //need to be careful about else if 
         String s1 = "aa";
         String s2 = "ab";
         String s3 = "abaa";
