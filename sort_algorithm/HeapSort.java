@@ -5,7 +5,7 @@ package sort_algorithm;
  */
 public class HeapSort {
     public static void main(String[] args) {
-        int arr[] = {1, 2, 3, 4, 6, 7, 0, 1, 2, 3, 6, 3, 2, 1, 2, 34, 6, 8, 21, 34, 21, 5, 23, 12};
+        int arr[] = {-1,-2,1, 2, 3, 4, 6, 7, 0, 1, 2, 3, 6, 3, 2, 1, 2, 34, 6, 8, 21, 34, 21, 5, 23, 12};
         heapSort(arr);
         for (int i = 0; i < arr.length; i++) {
             System.out.printf(arr[i] + " ");
