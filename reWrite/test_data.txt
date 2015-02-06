@@ -1,0 +1,192 @@
+public List<List<String>> findLadders(String start, String end, Set<String> dict) {
+            List<List<String>> result = new ArrayList<List<String>>();
+            if(dict.size()==0) {
+                return result;
+            }
+            if (start.equals(end)) {
+                return result;
+            }
+            Set<String> intermediateEnd = new HashSet<String>();
+            String[] intermeidateEndArr = findIntermediateWord(end);
+            for (int i = 0; i < intermeidateEndArr.length; i++) {
+                intermediateEnd.add(intermeidateEndArr[i]);
+            }
+            if (intermediateEnd.contains(start)) {
+                List<String> re = new ArrayList<String>();
+                re.add(start);
+                re.add(end);
+                result.add(re);
+                return result;
+            }
+            Set<NodeLi> findArr = new HashSet<NodeLi>();
+            NodeLi st = new NodeLi(start);
+            findArr.add(st);
+            if (dict.contains(start)) {
+                dict.remove(start);
+            }
+            if (dict.contains(end)) {
+                dict.remove(end);
+            }
+            List<NodeLi> nodeLiResult = findNodeResult(findArr, dict, intermediateEnd);
+            for (NodeLi li : nodeLiResult) {
+                List<String> ll = new ArrayList<String>();
+                while (li.next != null) {
+                    ll.add(li.val);
+                    li = li.next;
+                }
+                ll = revere(start,ll,end);
+                result.add(ll);
+            }
+            return result;
+        }
+        private List<String> revere(String start, List<String> ll,String end) {
+            List<String> li = new ArrayList<String>();
+            li.add(start);
+            for (int i = ll.size() - 1; i >= 0; i--) {
+                li.add(ll.get(i));
+            }
+            li.add(end);
+            return li;
+        }
+        private List<NodeLi> findNodeResult(Set<NodeLi> findArr, Set<String> dict, Set<String> intermediateEnd) {
+            List<NodeLi> nodeLiResult = new ArrayList<NodeLi>();
+            Set<NodeLi> findArrNext = new HashSet<NodeLi>();
+            int len1 = findArr.size();
+            int len2 = dict.size();
+            Map<String, List<String>> map = new HashMap<String, List<String>>();
+            if (len1 > 26 && len2 > 26) {
+                if (len1 <= len2) {
+                    for (Iterator it = findArr.iterator(); it.hasNext(); ) {
+                        NodeLi ori = (NodeLi) it.next();
+                        String s = ori.val;
+                        if (!map.containsKey(s)) {
+                            String res[] = findIntermediateWord(s);
+                            List<String> p = new ArrayList<String>();
+                            for (int i = 0; i < res.length; i++) {
+                                if (dict.contains(res[i])) {
+                                    p.add(res[i]);
+                                    NodeLi k = new NodeLi(res[i]);
+                                    k.next = ori;
+                                    findArrNext.add(k);
+                                    if (intermediateEnd.contains(k.val)) {
+                                        nodeLiResult.add(k);
+                                    }
+                                }
+                            }
+                            if (p.size() != 0) {
+                                map.put(ori.val, p);
+                            }
+                        } else {
+                            List<String> re = map.get(s);
+                            for (int i = 0; i < re.size(); i++) {
+                                NodeLi k = new NodeLi(re.get(i));
+                                k.next = ori;
+                                findArrNext.add(k);
+                                if (intermediateEnd.contains(k.val)) {
+                                    nodeLiResult.add(k);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Map<String, List<NodeLi>> count = new HashMap<String, List<NodeLi>>();
+                    for (Iterator itk = findArr.iterator(); itk.hasNext(); ) {
+                        NodeLi value = (NodeLi) itk.next();
+                        String s = value.val;
+                        if (!count.containsKey(s)) {
+                            List<NodeLi> re = new ArrayList<NodeLi>();
+                            re.add(value);
+                            count.put(s, re);
+                        } else {
+                            count.get(s).add(value);
+                        }
+                    }
+                    for (Iterator itd = dict.iterator(); itd.hasNext(); ) {
+                        String s = itd.next().toString();
+                        String res[] = findIntermediateWord(s);
+                        for (int i = 0; i < res.length; i++) {
+                            if (count.containsKey(res[i])) {
+                                List<NodeLi> re = count.get(res[i]);
+                                for (int u = 0; u < re.size(); u++) {
+                                    NodeLi k = new NodeLi(s);
+                                    k.next = re.get(u);
+                                    findArrNext.add(k);
+                                    if (intermediateEnd.contains(k.val)) {
+                                        nodeLiResult.add(k);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                for (Iterator it1 = findArr.iterator(); it1.hasNext(); ) {
+                    NodeLi ori = (NodeLi) it1.next();
+                    if (!map.containsKey(ori.val)) {
+                        List<String> p = new ArrayList<String>();
+                        for (Iterator it2 = dict.iterator(); it2.hasNext(); ) {
+                            String ss = it2.next().toString();
+                            if (recognize(ori.val, ss)) {
+                                p.add(ss);
+                                NodeLi k = new NodeLi(ss);
+                                k.next = ori;
+                                findArrNext.add(k);
+                                if (intermediateEnd.contains(k.val)) {
+                                    nodeLiResult.add(k);
+                                }
+                            }
+                        }
+                        if (p.size() > 0) {
+                            map.put(ori.val, p);
+                        }
+                    } else {
+                        List<String> re = map.get(ori.val);
+                        for (int i = 0; i < re.size(); i++) {
+                            NodeLi k = new NodeLi(re.get(i));
+                            k.next = ori;
+                            findArrNext.add(k);
+                            if (intermediateEnd.contains(k.val)) {
+                                nodeLiResult.add(k);
+                            }
+                        }
+                    }
+                }
+            }
+            if (nodeLiResult.size() != 0 || findArrNext.size() == 0 || dict.size() == 0) {
+                return nodeLiResult;
+            }
+            for (Iterator it = findArrNext.iterator(); it.hasNext(); ) {
+                String s = ((NodeLi) it.next()).val;
+                if (dict.contains(s)) {
+                    dict.remove(s);
+                }
+            }
+            return findNodeResult(findArrNext, dict, intermediateEnd);
+        }
+        private boolean recognize(String val, String ss) {
+            int j = 0;
+            for (int i = 0; i < val.length(); i++) {
+                if (val.charAt(i) != ss.charAt(i)) {
+                    j++;
+                }
+                if (j > 1) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        private String[] findIntermediateWord(String s) {
+            int len = s.length();
+            int rLen = len * 25;
+            String[] res = new String[rLen];
+            int k = 0;
+            for (int i = 0; i < len; i++) {
+                for (char c = 'a'; c <= 'z'; c++) {
+                    if (c != s.charAt(i)) {
+                        String word = s.substring(0, i) + c + s.substring(i + 1, len);
+                        res[k++] = word;
+                    }
+                }
+            }
+            return res;
+        }

@@ -2,15 +2,6 @@
  * Created by bruce on 14-11-5.
  */
 public class RotateList {
-    public class ListNode {
-        int val;
-        ListNode next;
-
-        ListNode(int x) {
-            val = x;
-            next = null;
-        }
-    }
 
     public class Solution {
         public ListNode rotateRight(ListNode head, int n) {

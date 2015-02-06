@@ -2,15 +2,6 @@
  * Created by bruce on 14-11-8.
  */
 public class PartitionList {
-    public static class ListNode {
-        int val;
-        ListNode next;
-
-        ListNode(int x) {
-            val = x;
-            next = null;
-        }
-    }
 
     public ListNode partition(ListNode head, int x) {
         ListNode p = head;

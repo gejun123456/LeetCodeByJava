@@ -8,16 +8,6 @@ import java.util.List;
 
 public class SortList {
 
-    class ListNode {
-        int val;
-        ListNode next;
-
-        ListNode(int x) {
-            val = x;
-            next = null;
-        }
-    }
-
     public ListNode sortList(ListNode head) {
         ListNode p = head;
         int[] arr = new int[100000];
