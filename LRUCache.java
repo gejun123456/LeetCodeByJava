@@ -1,42 +1,75 @@
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by bruce on 14-11-23.
  */
 public class LRUCache {
-    private LinkedHashMap<Integer,Integer> linkedHashMap;
     private int capacity;
     private int size = 0;
-    public LRUCache(final int capacity) {
+    private Node start;
+    private Node end;
+    private Set<Integer> set = new HashSet<Integer>();
+
+    public LRUCache(int capacity) {
         this.capacity = capacity;
-        linkedHashMap = new LinkedHashMap<Integer, Integer>() {
-            @Override
-            protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
-                return size() > capacity;
-            }
-        };
     }
 
     public int get(int key) {
-        if(linkedHashMap.containsKey(key)) {
-            int value = linkedHashMap.get(key);
-            linkedHashMap.remove(key);
-            linkedHashMap.put(key,value);
-            return value;
-        }
-        return -1;
+        return 1;
     }
 
     public void set(int key, int value) {
-        if(linkedHashMap.containsKey(key)){
-            linkedHashMap.remove(key);
-            linkedHashMap.put(key,value);
+        if (size == 0) {
+            start = new Node(key, value);
+            end = start;
+            set.add(key);
+            size++;
+            return;
+        }
+        if (!set.contains(key)) {
+            if (size == capacity) {
+                Node q = end;
+                set.remove(q.key);
+                end = end.before;
+                q = null;
+                size--;
+            }
+            Node m = start;
+            Node u = new Node(key, value);
+            u.next = m;
+            start = u;
+            size++;
+            set.add(key);
         } else {
-            linkedHashMap.put(key,value);
+            Node r = start;
+            while (r != null) {
+                if (r.key == key) {
+                    Node a = r.before;
+                    Node b = r.next;
+                    a.next = b;
+                    b.before = a;
+                    r.next =start;
+                    start = r;
+                    break;
+                }
+                r = r.next;
+            }
         }
     }
+
+
+    static class Node {
+        int key;
+        int value;
+        Node next;
+        Node before;
+
+        Node(int key, int value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
     public static void main(String[] args) {
         LRUCache lruCache = new LRUCache(2);
         lruCache.set(2, 1);
