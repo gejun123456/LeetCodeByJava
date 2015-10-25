@@ -72,6 +72,7 @@ public class LRUCache {
                 if(i.key.equals(key)){
                     return i.value;
                 }
+                i = i.next;
             }
             return null;
         }
@@ -96,22 +97,26 @@ public class LRUCache {
                 first.before = node;
                 first = node;
             }
+            size++;
         }
 
         //移除一个元素 如果不存在则不管
         public void remove(K key){
             int cur = hash(key);
             Node<K,V> i = table[cur];
+            if(i==null){
+                return;
+            }
             //判断是否是链表头结点
             if(i.key.equals(key)){
-                i.before.after = i.after;
-                i.after.before = i.before;
+                size--;
+                removeBalanceLinked(i);
                 table[cur] = i.next;
             } else{
                 while(i.next!=null){
                     if(i.next.key.equals(key)){
-                        i.next.before.after = i.next.after;
-                        i.next.after.before = i.before;
+                        size--;
+                        removeBalanceLinked(i.next);
                         i.next = i.next.next;
                     }
                 }
@@ -125,13 +130,26 @@ public class LRUCache {
             int cur = hash(node.key);
             Node<K,V> lastLink = table[cur];
             if(lastLink==node){
+                size--;
                 table[cur] = node.next;
             } else {
                 while(lastLink.next!=null){
                     if(lastLink.next==node){
+                        size--;
                         lastLink.next = node.next;
                     }
                 }
+            }
+        }
+
+        private void removeBalanceLinked(Node i){
+            if(i==first){
+                first = i.after;
+            } else if(i==last){
+                last = i.before;
+            } else {
+                i.before.after = i.after;
+                i.after.before = i.before;
             }
         }
 
@@ -156,6 +174,18 @@ public class LRUCache {
             return this.size==0;
         }
 
+
+    }
+
+    public static void main(String[] args) {
+        LRUCache lruCache = new LRUCache(3);
+        lruCache.set(1,2);
+        lruCache.set(2,4);
+        System.out.println(lruCache.get(2));
+        lruCache.set(5,6);
+        lruCache.set(7,8);
+        //应该返回-1
+        System.out.println(lruCache.get(1));
 
     }
 
