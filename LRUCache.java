@@ -4,80 +4,90 @@ import java.util.*;
  * Created by bruce on 14-11-23.
  */
 public class LRUCache {
-    private int capacity;
-    private int size = 0;
-    private Node start;
-    private Node end;
-    private Set<Integer> set = new HashSet<Integer>();
+
+    private MyLinkedHashMap myLinkedHashMap;
 
     public LRUCache(int capacity) {
-        this.capacity = capacity;
+
     }
 
     public int get(int key) {
-        return 1;
+
     }
 
     public void set(int key, int value) {
-        if (size == 0) {
-            start = new Node(key, value);
-            end = start;
-            set.add(key);
-            size++;
-            return;
+
+    }
+
+
+    public static class MyLinkedHashMap<K,V>{
+        private Node[] table = {};
+
+        private Node first;   //放入的第一个元素
+
+        private Node last;  //放入的最后一个元素
+
+        private int size = 0;
+
+        private int capacity;
+
+
+        public MyLinkedHashMap(int size){
+            //初始化这个hashMap
+            this.capacity = size;
+            int tableSize = findBig(size);
+            table = new Node[tableSize];
         }
-        if (!set.contains(key)) {
-            if (size == capacity) {
-                Node q = end;
-                set.remove(q.key);
-                end = end.before;
-                q = null;
-                size--;
+
+        private int findBig(int size) {
+            int k  = 2;
+            while(k<size){
+                k = k*2;
             }
-            Node m = start;
-            Node u = new Node(key, value);
-            u.next = m;
-            start = u;
-            size++;
-            set.add(key);
-        } else {
-            Node r = start;
-            while (r != null) {
-                if (r.key == key) {
-                    Node a = r.before;
-                    Node b = r.next;
-                    a.next = b;
-                    b.before = a;
-                    r.next =start;
-                    start = r;
-                    break;
-                }
-                r = r.next;
+            return k;
+        }
+
+        public V get(K key) {
+
+        }
+
+        public void set(K key, V value) {
+
+        }
+
+        public static class Node<K,V>{
+            K key;
+            V value;
+            Node next;  //作为数组上的下一个值
+            Node after; //后来放入的一个值
+            Node before;//前面的一个键 先删后加
+            public Node(K key,V value){
+                this.key = key;
+                this.value = value;
             }
         }
-    }
 
+        public void put(K key,V value){
 
-    static class Node {
-        int key;
-        int value;
-        Node next;
-        Node before;
-
-        Node(int key, int value) {
-            this.key = key;
-            this.value = value;
+            //如果map为空
+            if(isEmpty()){
+            }
         }
+
+        public int get(K key){
+
+        }
+
+        //是否放入足够的值
+        public boolean isFull(){
+            return this.size==capacity;
+        }
+
+        public boolean isEmpty(){
+            return this.size==0;
+        }
+
+
     }
 
-    public static void main(String[] args) {
-        LRUCache lruCache = new LRUCache(2);
-        lruCache.set(2, 1);
-        lruCache.set(2, 2);
-        System.out.println(lruCache.get(2));
-        lruCache.set(1, 1);
-        lruCache.set(4, 1);
-        System.out.println(lruCache.get(2));
-//        System.out.println(lruCache.get(3));
-    }
 }
