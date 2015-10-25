@@ -1,27 +1,45 @@
-import java.util.*;
-
 /**
  * Created by bruce on 14-11-23.
  */
 public class LRUCache {
 
-    private MyLinkedHashMap myLinkedHashMap;
+    private MyLinkedHashMap<Integer,Integer> myLinkedHashMap;
 
     public LRUCache(int capacity) {
-
+        myLinkedHashMap = new MyLinkedHashMap<Integer,Integer>(capacity);
     }
 
     public int get(int key) {
-
+        Integer value = myLinkedHashMap.getValue(key);
+        if(value==null){
+            return -1;
+        } else {
+            myLinkedHashMap.remove(key);
+            myLinkedHashMap.setValue(key,value);
+            return value;
+        }
     }
 
     public void set(int key, int value) {
-
+        Integer oldValue = myLinkedHashMap.getValue(key);
+        if(oldValue!=null){
+            myLinkedHashMap.remove(key);
+            myLinkedHashMap.setValue(key,value);
+        } else {
+            if(myLinkedHashMap.isFull()){
+                myLinkedHashMap.removeLast();
+                myLinkedHashMap.setValue(key,value);
+            } else {
+                myLinkedHashMap.setValue(key,value);
+            }
+        }
     }
 
 
     public static class MyLinkedHashMap<K,V>{
         private Node[] table = {};
+
+        private int tableSize;
 
         private Node first;   //放入的第一个元素
 
@@ -35,7 +53,7 @@ public class LRUCache {
         public MyLinkedHashMap(int size){
             //初始化这个hashMap
             this.capacity = size;
-            int tableSize = findBig(size);
+            this.tableSize = findBig(size);
             table = new Node[tableSize];
         }
 
@@ -47,12 +65,74 @@ public class LRUCache {
             return k;
         }
 
-        public V get(K key) {
-
+        public V getValue(K key) {
+            int cur = hash(key);
+            Node<K,V> i = table[cur];
+            while(i!=null){
+                if(i.key.equals(key)){
+                    return i.value;
+                }
+            }
+            return null;
         }
 
-        public void set(K key, V value) {
+        private int hash(K key) {
+            return key.hashCode()%tableSize;
+        }
 
+        public void setValue(K key, V value) {
+            Node<K,V> node = new Node(key,value);
+            //先插入到链表中
+            int cur = hash(key);
+            node.next = table[cur];
+            table[cur] = node;
+            //如果链表为空  构建这个双链表
+            //插入链表的头部
+            if(isEmpty()){
+                first = node;
+                last = node;
+            } else {
+                node.after = first;
+                first.before = node;
+                first = node;
+            }
+        }
+
+        //移除一个元素 如果不存在则不管
+        public void remove(K key){
+            int cur = hash(key);
+            Node<K,V> i = table[cur];
+            //判断是否是链表头结点
+            if(i.key.equals(key)){
+                i.before.after = i.after;
+                i.after.before = i.before;
+                table[cur] = i.next;
+            } else{
+                while(i.next!=null){
+                    if(i.next.key.equals(key)){
+                        i.next.before.after = i.next.after;
+                        i.next.after.before = i.before;
+                        i.next = i.next.next;
+                    }
+                }
+            }
+        }
+
+        //移除最后一个元素
+        public void removeLast(){
+            Node<K,V> node = last;
+            last = last.before;
+            int cur = hash(node.key);
+            Node<K,V> lastLink = table[cur];
+            if(lastLink==node){
+                table[cur] = node.next;
+            } else {
+                while(lastLink.next!=null){
+                    if(lastLink.next==node){
+                        lastLink.next = node.next;
+                    }
+                }
+            }
         }
 
         public static class Node<K,V>{
@@ -65,17 +145,6 @@ public class LRUCache {
                 this.key = key;
                 this.value = value;
             }
-        }
-
-        public void put(K key,V value){
-
-            //如果map为空
-            if(isEmpty()){
-            }
-        }
-
-        public int get(K key){
-
         }
 
         //是否放入足够的值
