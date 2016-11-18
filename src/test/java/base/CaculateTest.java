@@ -1,8 +1,7 @@
 package base;
 
-import org.junit.Assert;
 import org.junit.Test;
-import simple.Caculate;
+import leetcode.Caculate;
 
 /**
  * Created by bruce on 2/7/2015.
