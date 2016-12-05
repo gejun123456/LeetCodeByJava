@@ -1,9 +1,6 @@
 package jpaparse.parser;
 
-import jpaparse.KeyWordConstants;
-import jpaparse.ParseException;
-import jpaparse.Term;
-import jpaparse.TermType;
+import jpaparse.*;
 import jpaparse.info.FindInfo;
 
 import java.util.ArrayList;
@@ -16,19 +13,10 @@ import java.util.regex.Pattern;
 /**
  * Created by bruce.ge on 2016/12/4.
  */
-public class FindParser {
+public class FindParser extends AbstractParser {
     // there are the order
 
     // make sure orderby matched before by. finddistinct before find.
-    private static String[] finds = {KeyWordConstants.FINDDISTINCT, KeyWordConstants.FIND};
-
-    private static String[] linkOp = {KeyWordConstants.AND, KeyWordConstants.OR};
-
-    private static String[] compareOp = {KeyWordConstants.BETWEEN, KeyWordConstants.GREATERTHAN, KeyWordConstants.LESSTHAN,
-            KeyWordConstants.ISNOTNULL, KeyWordConstants.ISNULL, KeyWordConstants.NOTNULL, KeyWordConstants.NOTLIKE, KeyWordConstants.LIKE
-            , KeyWordConstants.NOTIN, KeyWordConstants.NOT, KeyWordConstants.IN};
-
-    private static String[] order = {KeyWordConstants.ASC, KeyWordConstants.DESC};
 
 
     public static String parse(String methodName, List<String> props, String tableName) {
@@ -42,7 +30,11 @@ public class FindParser {
     private static String buildQueryBy(FindInfo info) {
         StringBuilder queryBuilder = new StringBuilder();
         if (!info.getDistinct()) {
-            queryBuilder.append("select" + info.getFetchPart());
+            if (info.getAllField()) {
+                queryBuilder.append("select *");
+            } else {
+                queryBuilder.append("select" + info.getFetchPart());
+            }
         } else {
             queryBuilder.append("select dictinct(" + info.getFetchPart() + ")");
         }
@@ -77,6 +69,7 @@ public class FindParser {
                         state = 3;
                         break;
                     } else if (cur.getTermType() == TermType.PROP) {
+                        info.setAllField(false);
                         info.setFetchPart(info.getFetchPart() + " " + cur.getValue());
                         state = 6;
                         break;
@@ -216,61 +209,6 @@ public class FindParser {
         }
     }
 
-    private static void handleWithCompare(FindInfo info, Term cur) {
-        switch (cur.getValue()) {
-            case KeyWordConstants.GREATERTHAN: {
-                info.setQueryPart(info.getQueryPart() + " >{" + info.getParamCount() + "}");
-                info.setParamCount(info.getParamCount() + 1);
-                break;
-            }
-            case KeyWordConstants.LESSTHAN: {
-                info.setQueryPart(info.getQueryPart() + " <{" + info.getParamCount() + "}");
-                info.setParamCount(info.getParamCount() + 1);
-                break;
-            }
-            case KeyWordConstants.BETWEEN: {
-                info.setQueryPart(info.getQueryPart() + " >={" + info.getParamCount() + "} and " + info.getLastQueryProp() + " <={" + (info.getParamCount() + 1) + "}");
-                info.setParamCount(info.getParamCount() + 2);
-                break;
-            }
-            case KeyWordConstants.ISNOTNULL: {
-                info.setQueryPart(info.getQueryPart() + " is not null");
-                break;
-            }
-            case KeyWordConstants.ISNULL: {
-                info.setQueryPart(info.getQueryPart() + " is null");
-                info.setParamCount(info.getParamCount());
-                break;
-            }
-            case KeyWordConstants.NOT: {
-                info.setQueryPart(info.getQueryPart() + " !={" + info.getParamCount() + "}");
-                info.setParamCount(info.getParamCount() + 1);
-                break;
-            }
-            case KeyWordConstants.NOTIN: {
-                info.setQueryPart(info.getQueryPart() + " not in{" + info.getParamCount() + "}");
-                info.setParamCount(info.getParamCount() + 1);
-                break;
-            }
-            case KeyWordConstants.IN: {
-                info.setQueryPart(info.getQueryPart() + " in{" + info.getParamCount() + "}");
-                info.setParamCount(info.getParamCount() + 1);
-                break;
-            }
-            case KeyWordConstants.NOTLIKE: {
-                info.setQueryPart(info.getQueryPart() + " not like{" + info.getParamCount() + "}");
-                info.setParamCount(info.getParamCount() + 1);
-                break;
-            }
-            case KeyWordConstants.LIKE: {
-                info.setQueryPart(info.getQueryPart() + " like{" + info.getParamCount() + "}");
-                info.setParamCount(info.getParamCount() + 1);
-                break;
-            }
-
-        }
-    }
-
 
     /**
      * @param methodName
@@ -302,7 +240,7 @@ public class FindParser {
         // than check with props
         for (String prop : props) {
             prop = prop.toLowerCase();
-            Pattern propPattern = Pattern.compile(prop);
+            Pattern propPattern = PatternUtils.getPattern(prop);
             Matcher propMatcher = propPattern.matcher(methodName);
             while (propMatcher.find()) {
                 int start = propMatcher.start();
@@ -328,7 +266,7 @@ public class FindParser {
         }
 
         //than check with by.  only find one time.
-        Pattern by = Pattern.compile(KeyWordConstants.BY);
+        Pattern by = PatternUtils.getPattern(KeyWordConstants.BY);
         Matcher matcher = by.matcher(methodName);
         while (matcher.find()) {
             int start = matcher.start();
@@ -346,7 +284,7 @@ public class FindParser {
 
         //than find with and and or.
         for (String link : linkOp) {
-            Pattern linkPattern = Pattern.compile(link);
+            Pattern linkPattern = PatternUtils.getPattern(link);
             Matcher andMatcher = linkPattern.matcher(methodName);
             while (andMatcher.find()) {
                 int start = andMatcher.start();
@@ -364,7 +302,7 @@ public class FindParser {
         //if is by then shall check with comparator.
         if (isBy) {
             for (String compare : compareOp) {
-                Pattern comparePattern = Pattern.compile(compare);
+                Pattern comparePattern = PatternUtils.getPattern(compare);
                 Matcher compareMatcher = comparePattern.matcher(methodName);
                 while (compareMatcher.find()) {
                     int start = compareMatcher.start();
@@ -383,7 +321,7 @@ public class FindParser {
         //shall check the order time.
         if (isOrderBy) {
             for (String ordertype : order) {
-                Pattern orderTypePattern = Pattern.compile(ordertype);
+                Pattern orderTypePattern = PatternUtils.getPattern(ordertype);
                 Matcher orderTypeMatcher = orderTypePattern.matcher(methodName);
                 while (orderTypeMatcher.find()) {
                     int start = orderTypeMatcher.start();

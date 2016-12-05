@@ -5,7 +5,7 @@ package jpaparse.info;
  */
 public class UpdateInfo extends BaseInfo {
 
-    private String updatePart;
+    private String updatePart = "";
 
     public String getUpdatePart() {
         return updatePart;
