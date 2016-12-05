@@ -31,15 +31,15 @@ public class FindParser {
     private static String[] order = {KeyWordConstants.ASC, KeyWordConstants.DESC};
 
 
-    public static String parse(String methodName, List<String> props) {
+    public static String parse(String methodName, List<String> props, String tableName) {
         //first try to split them into terms.
         List<Term> terms = generateTerm(methodName, props);
         FindInfo info = buildFindInfo(terms);
+        info.setTable(tableName);
         return buildQueryBy(info);
     }
 
     private static String buildQueryBy(FindInfo info) {
-        info.setTable("user");
         StringBuilder queryBuilder = new StringBuilder();
         if (!info.getDistinct()) {
             queryBuilder.append("select" + info.getFetchPart());
@@ -426,7 +426,7 @@ public class FindParser {
         ll.add("password");
         ll.add("username");
         List<Term> terms = generateTerm("FINDDISTINCTUSERIDANDPASSWORDBYUSERNAMELIKEORDERBYUSERIDDESC".toLowerCase(), ll);
-        System.out.println(parse("FINDUSERIDANDUSERNAMEBYUSERNAMELIKEANDUSERNAMEGREATERTHANANDPASSWORDBETWEENORDERBYUSERID".toLowerCase(), ll));
+        System.out.println(parse("FINDUSERIDANDUSERNAMEBYUSERNAMELIKEANDUSERNAMEGREATERTHANANDPASSWORDBETWEENORDERBYUSERID".toLowerCase(), ll, "user"));
 
     }
 }

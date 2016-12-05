@@ -3,23 +3,13 @@ package jpaparse.info;
 /**
  * Created by bruce.ge on 2016/12/4.
  */
-public class FindInfo {
-
-    private Integer paramCount = 0;
+public class FindInfo extends BaseInfo {
 
     private Boolean distinct = false;
 
     private Boolean allField = true;
 
-    private String lastQueryProp = "";
-
     private String fetchPart = "";
-
-    private String queryPart = "";
-
-    private String table;
-
-    private Integer lastEqualLength = 0;
 
 
     public Integer getLastEqualLength() {
