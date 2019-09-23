@@ -1,0 +1,35 @@
+    class Solution {
+        fun findCircleNum(M: Array<IntArray>): Int {
+            val size = M.size
+            //will cacluate the group in it.
+            val arrayOfNulls = arrayOfNulls<Int>(size)
+            var k = 0
+            for (i in (M.indices)) {
+                val ints = M[i]
+                for (j in i + 1 until ints.size) {
+                    val i1 = M[i][j]
+                    if (i1 == 1) {
+                        val iGroup = arrayOfNulls[i]
+                        val jGroup = arrayOfNulls[j]
+                        if (iGroup == null && jGroup == null) {
+                            arrayOfNulls[i] = k;
+                            arrayOfNulls[j] = k;
+                            k++
+                        } else if (iGroup == null) {
+                            arrayOfNulls[i] = jGroup;
+                        } else if (jGroup == null) {
+                            arrayOfNulls[j] = iGroup;
+                        }
+                    }
+                }
+            }
+            val count = arrayOfNulls.filter { it == null }.count()
+            return count + k;
+        }
+    }
+
+//total_testcases:113
+//total_correct:85
+//input_formatted:[[1,0,0,1],[0,1,1,0],[0,1,1,1],[1,0,1,1]]
+//expected_output:1
+//code_output:2
